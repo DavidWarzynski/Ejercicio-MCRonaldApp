@@ -20,4 +20,13 @@ public class Producto {
         this.nombre = nombre;
         this.stockDisponible = stockDisponible;
     }
+
+    @Override
+    public String toString() {
+        return "Producto{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", stockDisponible=" + stockDisponible +
+                '}';
+    }
 }

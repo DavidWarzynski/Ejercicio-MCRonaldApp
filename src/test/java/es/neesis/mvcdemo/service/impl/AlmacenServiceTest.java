@@ -6,8 +6,13 @@ import es.neesis.mvcdemo.model.Producto;
 import es.neesis.mvcdemo.repository.IProductoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +24,9 @@ class AlmacenServiceTest {
 
     private AlmacenService sut;
     private IProductoRepository productoRepository;
+
+    @TempDir
+    private Path tempDir;
 
     @BeforeEach
     void setUp() {
@@ -98,6 +106,25 @@ class AlmacenServiceTest {
         });
         //Then
         assertEquals("El producto no existe", exception.getMessage());
+    }
+
+    @Test
+    void testGuardarFicheroContenidoAlmacen_ShouldCrearFichero_WhenCalled(){
+        //Given
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String fechaFormateada = fechaActual.format(formatter);
+        String nombreArchivo= "contenidoAlmacen_" + fechaFormateada + ".txt";
+
+        Path file = tempDir.resolve(nombreArchivo);
+        //When
+        this.sut.guardarFicheroContenidoAlmacen(tempDir.toString());
+        //Then
+        assertAll(
+                () -> assertTrue(Files.exists(file),"Exists"),
+                () -> assertTrue(file.toFile().length() > 0),
+                () -> assertEquals(nombreArchivo, file.toFile().getName())
+        );
     }
 
 }

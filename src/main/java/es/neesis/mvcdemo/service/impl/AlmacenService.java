@@ -10,8 +10,15 @@ import es.neesis.mvcdemo.utils.DTOMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AlmacenService implements IAlmacenService {
@@ -46,5 +53,27 @@ public class AlmacenService implements IAlmacenService {
         BusinessChecks.exists(producto, "El producto no existe");
 
         productoRepository.deleteById(productoId);
+    }
+
+    public void guardarFicheroContenidoAlmacen(String directorio) {
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String fechaFormateada = fechaActual.format(formatter);
+        String nombreArchivo= "contenidoAlmacen_" + fechaFormateada + ".txt";
+        String rutaCompleta = directorio+"/"+nombreArchivo;
+        try {
+            FileWriter fileWriter = new FileWriter(rutaCompleta, true);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+
+            String contenidoAlmacen = getProductos().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(System.lineSeparator()));
+            bufferedWriter.write(contenidoAlmacen);
+            bufferedWriter.newLine();
+
+            bufferedWriter.close();
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        }
     }
 }

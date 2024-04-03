@@ -9,7 +9,10 @@ import es.neesis.mvcdemo.repository.IProductoRepository;
 import es.neesis.mvcdemo.utils.DTOMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +28,13 @@ class PedidoServiceTest {
     private IEmpleadoRepository empleadoRepository;
     private IPedidoRepository pedidoRepository;
     private Pedido pedido;
+    @Captor
+    private ArgumentCaptor<Pedido> pedidoArgumentCaptor;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
+
         this.productoRepository = Mockito.mock(IProductoRepository.class);
         this.empleadoRepository = Mockito.mock(IEmpleadoRepository.class);
         this.pedidoRepository = Mockito.mock(IPedidoRepository.class);
@@ -91,7 +98,7 @@ class PedidoServiceTest {
         //When
         this.sut.crearPedido(pedidoDTO);
         //Then
-        verify(pedidoRepository, times(1)).save(any());
+        verify(pedidoRepository, times(1)).save(this.pedidoArgumentCaptor.capture());
         verify(productoRepository, times(pedidoDTO.getProductos().size())).save(any());
     }
 
@@ -141,5 +148,4 @@ class PedidoServiceTest {
         });
         assertEquals("El pedido no existe",businessException.getMessage());
     }
-
 }
