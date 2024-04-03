@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta de Productos</title>
+    <link rel="stylesheet" href="carta.css">
+</head>
+<body>
+<div class="container">
+    <h1>Bienvenido a nuestra carta de productos</h1>
+    <div class="productos">
+        <div class="producto" th:each="productoCarta : ${productos}">
+            <h2 th:text="${productoCarta.producto.nombre}"></h2>
+            <p>Precio: €<span th:text="${productoCarta.precio}"></span></p>
+            <button class="add-to-cart" data-product-id="${productoCarta.id}">Añadir al Pedido</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Carrito de Compras</h1>
+    <div class="carrito">
+        <h2>Carrito</h2>
+        <div class="productos">
+            <div class="producto" th:each="productoCarta : ${carrito}">
+                <h2 th:text="${productoCarta.producto.nombre}"></h2>
+                <p>Precio: €<span th:text="${productoCarta.precio}"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', addToCart);
+        });
+
+         function addToCart(event) {
+                const productId = event.target.dataset.productId;
+                // Envío de la petición AJAX
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/carta/addProductoCarrito?productoId=' + productId, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log('Producto añadido al carrito correctamente.');
+                    }
+                };
+            xhr.send();
+         }
+    });
+</script>
+</body>
+</html>

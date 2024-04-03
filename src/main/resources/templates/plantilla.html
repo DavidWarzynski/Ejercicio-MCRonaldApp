@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plantilla de Empleados</title>
+</head>
+<body>
+<h1>Plantilla de Empleados</h1>
+
+<form id="addEmpleadoForm">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required>
+    <button type="submit">Agregar Empleado</button>
+</form>
+
+<ul id="empleadosList">
+</ul>
+
+<script>
+    function agregarEmpleado() {
+        var empleado = {
+            nombre: document.getElementById('nombre').value,
+        };
+
+        fetch('/plantilla/addEmpleado', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(empleado)
+        })
+        .then(response => response.json())
+        .catch(error => console.error('Error:', error));
+    }
+
+    function actualizarListaEmpleados(empleados) {
+        var empleadosList = document.getElementById('empleadosList');
+        empleadosList.innerHTML = '';
+        console.log(empleados);
+        empleados.forEach(function(empleado) {
+            var li = document.createElement('li');
+            li.textContent = empleado.nombre;
+            empleadosList.appendChild(li);
+        });
+    }
+
+    fetch('/plantilla/empleados')
+    .then(response => response.json())
+    .then(data => {
+    console.log(data);
+        actualizarListaEmpleados(data);
+    })
+    .catch(error => console.error('Error:', error));
+
+    document.getElementById('addEmpleadoForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        agregarEmpleado();
+    });
+</script>
+</body>
+</html>
